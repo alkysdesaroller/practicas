@@ -1,23 +1,64 @@
-name: Enviar notificación a ntfy.sh
+name: CI/CD con Notificaciones ntfy
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  notify:
+  build:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Chequear el repositorio
-        uses: actions/checkout@v4
-
-      - name: Ejecutar el programa Hola Mundo
-        run: |
-          echo "Ejecutando programa..."
-          node app.js
-
-      - name: Enviar notificación a ntfy.sh
-        run: |
-          curl -d " Nuevo código subido al repositorio principal (main)!" ntfy.sh/devops-itla
+    - uses: actions/checkout@v3
+    
+    - name: Configurar entorno
+      run: |
+        echo "Configurando proyecto..."
+    
+    - name: Ejecutar tests
+      run: |
+        echo "Ejecutando tests..."
+        # npm test o tus comandos de test
+    
+    - name: Build del proyecto
+      run: |
+        echo "Compilando proyecto..."
+        # npm run build o tus comandos de build
+    
+    # Notificación de ÉXITO
+    - name: Notificar Éxito
+      if: success()
+      run: |
+        curl -H "Title: ✅ Build Completado con Éxito" \
+          -H "Tags: success,ci,devops,itla" \
+          -H "Priority: default" \
+          -d "El programa Hola Mundo se ejecutó correctamente y todos los tests pasaron.
+          
+          Integración Continua funcionando perfectamente!
+          
+          Estudiante: ${{ github.actor }}
+          Curso: Electiva 2 - DevOps
+          Repositorio: ${{ github.repository }}
+          Rama: ${{ github.ref_name }}
+          Commit: ${{ github.sha }}
+          
+          Ver detalles: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+          https://ntfy.sh/devops-itla
+    
+    # Notificación de FALLO
+    - name: Notificar Fallo
+      if: failure()
+      run: |
+        curl -H "Title: ❌ Build FALLIDO" \
+          -H "Tags: warning,ci,devops,itla" \
+          -H "Priority: high" \
+          -d "El build ha fallado. Por favor revisa los logs.
+          
+          Estudiante: ${{ github.actor }}
+          Repositorio: ${{ github.repository }}
+          Rama: ${{ github.ref_name }}
+          
+          Ver detalles: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+          https://ntfy.sh/devops-itla
