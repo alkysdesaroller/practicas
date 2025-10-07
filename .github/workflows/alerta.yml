@@ -1,0 +1,23 @@
+name: Enviar notificación a ntfy.sh
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Chequear el repositorio
+        uses: actions/checkout@v4
+
+      - name: Ejecutar el programa Hola Mundo
+        run: |
+          echo "Ejecutando programa..."
+          node app.js
+
+      - name: Enviar notificación a ntfy.sh
+        run: |
+          curl -d " Nuevo código subido al repositorio principal (main)!" ntfy.sh/devops-itla
